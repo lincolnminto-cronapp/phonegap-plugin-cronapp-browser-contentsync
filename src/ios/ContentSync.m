@@ -115,19 +115,12 @@
     // set previous version to current version
     [defaults setObject:currentVersion forKey:@"PREVIOUS_VERSION"];
     [defaults synchronize];
-    
-    BOOL appHasBeenUpdated = ([currentVersion compare:previousVersion options:NSNumericSearch] == NSOrderedDescending);
 
-    // This condition seems to occur on the 2nd run of the app, when the PREVIOUS_VERSION entry has not yet been set.
-    // In this case, appHasBeenUpdated will incorrectly be set to YES, even though the app has not actually been updated.
-    if (previousVersion == nil && currentVersion != nil) {
-        NSLog(@"previous version has not yet been set. skipping comparison");
-        appHasBeenUpdated = false;
-    } else if (appHasBeenUpdated == true) {
-        NSLog(@"current version is newer than previous version");
+    if ([currentVersion compare:previousVersion options:NSNumericSearch] == NSOrderedDescending) {
+        NSLog(@"current version is newer than previous version");;
     }
 
-    return appHasBeenUpdated;
+    return ([currentVersion compare:previousVersion options:NSNumericSearch] == NSOrderedDescending);
 }
 
 - (void)sync:(CDVInvokedUrlCommand*)command {
@@ -160,9 +153,8 @@
     }
 
     BOOL copyRootApp = [[command argumentAtIndex:5 withDefault:@(NO)] boolValue];
-    BOOL copyCordovaAssetsValue = [[command argumentAtIndex:4 withDefault:@(NO)] boolValue];
 
-    if(copyRootApp == YES || copyCordovaAssetsValue == YES) {
+    if(copyRootApp == YES) {
         __block NSError* error = nil;
 
         NSLog(@"Creating app directory %@", [appPath path]);
@@ -186,7 +178,7 @@
         } else {
             [self.commandDelegate runInBackground:^{
                 CDVPluginResult *pluginResult = nil;
-                [self copyCordovaAssets:[appPath path] copyRootApp:copyRootApp];
+                [self copyCordovaAssets:[appPath path] copyRootApp:YES];
                 if(src == nil) {
                     NSMutableDictionary* message = [NSMutableDictionary dictionaryWithCapacity:2];
                     [message setObject:[appPath path] forKey:@"localPath"];
@@ -710,6 +702,8 @@
     return [self copyCordovaAssets:unzippedPath copyRootApp:false];
 }
 
+// TODO GET RID OF THIS
+// THIS F!@#% BS
 - (BOOL) copyCordovaAssets:(NSString*)unzippedPath copyRootApp:(BOOL)copyRootApp {
     NSLog(@"copyCordovaAssets");
     NSError *errorCopy;
@@ -738,23 +732,31 @@
         return YES;
     }
     NSLog(@"Copying Cordova Assets");
-    NSArray* cordovaAssets = [NSArray arrayWithObjects:@"cordova.js",@"cordova_plugins.js",@"plugins", nil];
+    NSArray* cordovaAssets = [NSArray arrayWithObjects:@"cordova.js",@"cordova_plugins.js", @"plugins",nil];
     NSString* suffix = @"/www";
+
+    NSURL* assetsSourceURL = [NSURL fileURLWithPath:[[self commandDelegate] pathForResource:@"plugins"]];
+    NSArray* subp = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:assetsSourceURL error:Nil];
 
     if([fileManager fileExistsAtPath:[unzippedPath stringByAppendingString:suffix]]) {
         destinationURL = [destinationURL URLByAppendingPathComponent:suffix];
         NSLog(@"Found %@ folder. Will copy Cordova assets to it.", suffix);
     }
 
+    for(NSString* asset in subp) {
+        NSURL* assetSourceURL = [NSURL fileURLWithPath:[[self commandDelegate] pathForResource:[NSString stringWithFormat:@"%@/%@", @"plugins", asset]]];
+        NSURL* assetDestinationURL = [destinationURL URLByAppendingPathComponent:[NSString stringWithFormat:@"%@/%@", @"plugins", asset]];
+
+        [fileManager copyItemAtURL:assetSourceURL toURL:assetDestinationURL error:&errorCopy];
+    }
+
     for(NSString* asset in cordovaAssets) {
         NSURL* assetSourceURL = [NSURL fileURLWithPath:[[self commandDelegate] pathForResource:asset]];
         NSURL* assetDestinationURL = [destinationURL URLByAppendingPathComponent:[assetSourceURL lastPathComponent]];
-        [fileManager removeItemAtURL:assetDestinationURL error:NULL];
-        BOOL success = [fileManager copyItemAtURL:assetSourceURL toURL:assetDestinationURL error:&errorCopy];
+        //Removido
+		//[fileManager removeItemAtURL:assetDestinationURL error:NULL];
+        [fileManager copyItemAtURL:assetSourceURL toURL:assetDestinationURL error:&errorCopy];
 
-        if(!success) {
-            return NO;
-        }
     }
 
     return YES;

@@ -2,16 +2,16 @@
   "name": "phonegap-plugin-contentsync",
   "description": "Fetch and cache content for your PhoneGap app.",
   "version": "1.4.2",
-  "homepage": "http://github.com/phonegap/phonegap-plugin-contentsync#readme",
+  "homepage": "https://github.com/lincolnminto-cronapp/phonegap-plugin-cronapp-browser-contentsync#readme",
   "repository": {
     "type": "git",
-    "url": "git://github.com/phonegap/phonegap-plugin-contentsync.git"
+    "url": "git://github.com/lincolnminto-cronapp/phonegap-plugin-cronapp-browser-contentsync.git"
   },
   "bugs": {
-    "url": "https://github.com/phonegap/phonegap-plugin-contentsync/issues"
+    "url": "https://github.com/lincolnminto-cronapp/phonegap-plugin-cronapp-browser-contentsync/issues"
   },
   "cordova": {
-    "id": "phonegap-plugin-contentsync",
+    "id": "phonegap-plugin-cronapp-browser-contentsync",
     "platforms": [
       "ios",
       "android",
