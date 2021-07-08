@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="phonegap-plugin-contentsync" version="1.4.2">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="phonegap-plugin-cronapp-browser-contentsync" version="1.4.2">
   <name>content-sync</name>
-  <description>PhoneGap Content Sync Plugin</description>
+  <description>PhoneGap Content Sync Plugin for Cronapp Browser</description>
   <license/>
   <keywords>phonegap,content sync</keywords>
   <repo>https://github.com/phonegap/phonegap-plugin-contentsync</repo>
